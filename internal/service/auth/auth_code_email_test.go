@@ -20,7 +20,7 @@ func TestParseTemplate(t *testing.T) {
 }
 
 func TestSendAuthCodeEmail(t *testing.T) {
-	settings, err := setting.NewSettingsWithDirectory("../../../configs")
+	settings, err := setting.NewSettingsWithDirectory("../../../config")
 	assert.NoError(t, err)
 	err = sendAuthCodeEmail(settings.SmtpSetting, "666666", "0xdadak@proton.me")
 	assert.NoError(t, err)

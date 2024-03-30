@@ -57,7 +57,7 @@ func (c *ChainClient) SendTx2(signtx string) (string, error) {
 			if status.IsInBlock {
 				txhash, _ = codec.EncodeToHex(status.AsInBlock)
 				events := types.EventRecords{}
-				h, err := c.api.RPC.State.GetStorageRaw(c.keyEvents, status.AsInBlock)
+				h, err := c.api.RPC.State.GetStorageRaw(c.eventsKey, status.AsInBlock)
 				if err != nil {
 					logger.Error(err, "send tx error", "tx", txhash)
 					return txhash, err

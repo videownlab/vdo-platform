@@ -31,6 +31,14 @@ func sendAuthCodeEmail(smtpSetting *setting.SmtpSettingS, autoCode string, to ..
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", *mailBody)
 
+	// mail.NetDialTimeout = func(network string, address string, timeout time.Duration) (net.Conn, error) {
+	// 	dial, err := proxy.SOCKS5("tcp", "127.0.0.1:7890", nil, proxy.Direct)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	return dial.Dial("tcp", smtp_host.(string))
+	// }
+
 	d := gomail.NewDialer(smtpSetting.Host, int(smtpSetting.Port), smtpSetting.Username, smtpSetting.Password)
 	return d.DialAndSend(m)
 }
