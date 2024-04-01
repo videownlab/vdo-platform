@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"math/big"
 	"time"
 	"vdo-platform/internal/app/ctx"
 	"vdo-platform/internal/dto"
@@ -90,7 +91,7 @@ func LoginByEmail(req dto.EmailLoginReq) (*LoginResult, error) {
 		}
 		logger.Info("email account wallet address", "walletAddress", account.WalletAddress)
 		go func() {
-			amount := uint64(10000)
+			amount := big.NewInt(10000)
 			logger.Info("give money to wallet", "walletAddress", account.WalletAddress, "amount", amount, "email", account.Email)
 			ctx.ChainClient.TransferBySs58Address(account.WalletAddress, amount)
 		}()

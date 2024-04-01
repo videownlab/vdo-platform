@@ -44,10 +44,6 @@ func (c *ChainClient) GetSyncStatus() (bool, error) {
 	return h.IsSyncing, nil
 }
 
-func (c *ChainClient) GetChainStatus() bool {
-	return c.GetChainState()
-}
-
 func (c *ChainClient) GetChainMethodList() []string {
 	methods := make([]string, 0)
 	for _, v := range c.metadata.AsMetadataV8.Modules {
@@ -62,12 +58,6 @@ func (c *ChainClient) GetCessAccount() (string, error) {
 
 func (c *ChainClient) GetAccountInfo(pkey []byte) (types.AccountInfo, error) {
 	var data types.AccountInfo
-
-	if !c.IsChainClientOk() {
-		c.SetChainState(false)
-		return data, ERR_RPC_CONNECTION
-	}
-	c.SetChainState(true)
 	a, err := types.NewAccountID(pkey)
 	if err != nil {
 		return data, errors.Wrap(err, "[NewAccountID]")
