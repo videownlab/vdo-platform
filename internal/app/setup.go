@@ -108,7 +108,7 @@ func setupChainConnection() error {
 	ctx.ChainClient, err = chain.NewChainClient(
 		ctx.Settings.Web3Setting.RpcEndpoints[0],
 		ctx.Settings.Web3Setting.Mnemonic,
-		30*time.Second,
+		ctx.Settings.Web3Setting.ChainId,
 	)
 	if err != nil {
 		return err
