@@ -20,3 +20,9 @@ func TestRandAlphanumeric(t *testing.T) {
 		fmt.Println(an)
 	}
 }
+
+func TestRandNumeric(t *testing.T) {
+	an := RandNumeric(6)
+	assert.Equal(t, 6, len(an))
+	fmt.Println(an)
+}

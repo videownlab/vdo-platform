@@ -2,14 +2,11 @@ package account
 
 import (
 	"encoding/hex"
-	"strconv"
-	"strings"
 	"time"
 
 	"gorm.io/gorm"
 
 	"vdo-platform/internal/service/account/entity"
-	"vdo-platform/pkg/utils"
 
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
@@ -80,7 +77,7 @@ func (t *AccountService) CreateByEmail(email string) (*entity.Account, error) {
 	return acc, err
 }
 
-func (t *AccountService) CreateByPrivateWallet(walletAddress string) (*entity.Account, error) {
+func (t *AccountService) CreateByPrivateDotWallet(walletAddress string) (*entity.Account, error) {
 	network, pubkey, err := subkey.SS58Decode(walletAddress)
 	if err != nil {
 		return nil, err
@@ -90,7 +87,7 @@ func (t *AccountService) CreateByPrivateWallet(walletAddress string) (*entity.Ac
 	}
 	acc := &entity.Account{
 		WalletAddress: walletAddress,
-		Kind:          entity.AK_PRIVATE_OWN,
+		Kind:          entity.AK_PRIVATE_DOT,
 		PublicKey:     hex.EncodeToString(pubkey),
 		CreatedAt:     time.Now(),
 	}
@@ -98,29 +95,21 @@ func (t *AccountService) CreateByPrivateWallet(walletAddress string) (*entity.Ac
 	return acc, err
 }
 
-func VerifyWalletSign(walletAddress string, timestamp int64, sign string) error {
-	signBytes, err := hex.DecodeString(sign)
+func (t *AccountService) CreateByPrivateEthWallet(dotWalletAddress, ethWalletAddress string) (*entity.Account, error) {
+	network, pubkey, err := subkey.SS58Decode(dotWalletAddress)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if utils.Abs(time.Now().Unix()-timestamp) > 300 {
-		return errors.New("invalid timestamp")
+	if network != t.chainId {
+		dotWalletAddress = subkey.SS58Encode(pubkey, t.chainId)
 	}
-	_, pubkeyBytes, err := subkey.SS58Decode(walletAddress)
-	if err != nil {
-		return err
+	acc := &entity.Account{
+		WalletAddress: dotWalletAddress,
+		Kind:          entity.AK_PRIVATE_ETH,
+		PublicKey:     hex.EncodeToString(pubkey),
+		EthAddress:    &ethWalletAddress,
+		CreatedAt:     time.Now(),
 	}
-	pubkey, err := sr25519.Scheme{}.FromPublicKey(pubkeyBytes)
-	if err != nil {
-		return err
-	}
-	var sb strings.Builder
-	sb.WriteString("<Bytes>")
-	sb.WriteString(walletAddress)
-	sb.WriteString(strconv.FormatInt(timestamp, 10))
-	sb.WriteString("</Bytes>")
-	if !pubkey.Verify([]byte(sb.String()), signBytes) {
-		return errors.New("invalid wallet sign")
-	}
-	return nil
+	err = t.gorm.Create(acc).Error
+	return acc, err
 }
