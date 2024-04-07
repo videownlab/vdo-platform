@@ -54,6 +54,7 @@ func CreateVideoMetadata(req dto.CreateReq) (dto.CreateResp, error) {
 		NftStatus:   model.CREATE.String(),
 		FileStatus:  model.UPLOAD.String(),
 		Chain:       model.DEFAULT_CHAIN,
+		NftType:     req.NftType,
 	}
 	err := videoInfo.Create(ctx.GormDb)
 	if err != nil {

@@ -43,13 +43,27 @@ func (t AuthAPI) LoginByEmail(c *gin.Context) {
 	resp.Ok(c, ar)
 }
 
-func (t AuthAPI) LoginByWallet(c *gin.Context) {
-	var f dto.WalletLoginReq
+func (t AuthAPI) LoginByDotWallet(c *gin.Context) {
+	var f dto.DotWalletLoginReq
 	if err := c.ShouldBind(&f); err != nil {
 		resp.Error(c, err)
 		return
 	}
-	ar, err := auth.LoginByWallet(f)
+	ar, err := auth.LoginByDotWallet(f)
+	if err != nil {
+		resp.Error(c, err)
+		return
+	}
+	resp.Ok(c, ar)
+}
+
+func (t AuthAPI) LoginByEthWallet(c *gin.Context) {
+	var f dto.EthWalletLoginReq
+	if err := c.ShouldBind(&f); err != nil {
+		resp.Error(c, err)
+		return
+	}
+	ar, err := auth.LoginByEthWallet(f)
 	if err != nil {
 		resp.Error(c, err)
 		return

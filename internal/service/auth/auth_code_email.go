@@ -3,7 +3,6 @@ package auth
 import (
 	"bytes"
 	"embed"
-	"fmt"
 	"html/template"
 	"vdo-platform/pkg/setting"
 
@@ -19,7 +18,7 @@ func sendAuthCodeEmail(smtpSetting *setting.SmtpSettingS, autoCode string, to ..
 	}{
 		AuthCode: autoCode,
 	}
-	subject := fmt.Sprintf("[%s] Videown auth code", templateData.AuthCode)
+	subject := "[Videown] email login auth code"
 	mailBody, err := parseTemplate(templateData)
 	if err != nil {
 		return err

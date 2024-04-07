@@ -140,7 +140,10 @@ func SaveCoverImg(file *multipart.FileHeader, filename string) error {
 		filename[4:8],
 		filename[8:12],
 	)
-	os.MkdirAll(fpath, 0755)
+	err := os.MkdirAll(fpath, 0755)
+	if err != nil {
+		return errors.Wrap(err, "create image directory error")
+	}
 	fpath = path.Join(fpath, filename)
 	if _, err := os.Stat(fpath); err == nil {
 		return nil

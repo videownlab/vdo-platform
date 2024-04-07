@@ -9,7 +9,8 @@ type AccountKind uint8
 
 const (
 	AK_EMAIL_GEN = AccountKind(1) + iota
-	AK_PRIVATE_OWN
+	AK_PRIVATE_DOT
+	AK_PRIVATE_ETH
 )
 
 type Account struct {
@@ -18,6 +19,7 @@ type Account struct {
 	Email         *string      `gorm:"default:null;size:50" json:"email"`
 	PublicKey     string       `gorm:"not null;size:64" json:""`
 	Seed          *string      `gorm:"default:null" json:"-"`
+	EthAddress    *string      `gorm:"default:null;size:42" json:"ethAddress"`
 	CreatedAt     time.Time    `gorm:"comment:create time" json:"createdAt"`
 	UpdatedAt     sql.NullTime `gorm:"comment:update time" json:"updatedAt"`
 }

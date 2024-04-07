@@ -23,6 +23,7 @@ func NewRouter() *gin.Engine {
 		resp.ErrorWithHttpStatus(c, err.(error), http.StatusInternalServerError)
 		c.Abort()
 	}))
+	router.MaxMultipartMemory = 8 << 20 // 8 MiB
 
 	registerEndpointsForSys(router)
 	registerEndpointsForVideo(router)
@@ -84,7 +85,8 @@ func registerEndpointsForSys(router *gin.Engine) {
 		g.GET("/ts", func(c *gin.Context) { resp.Ok(c, time.Now().Unix()) })
 		g.PUT("/apply-code", s.ApplyAuthCode)
 		g.PUT("/login-by-email", s.LoginByEmail)
-		g.PUT("/login-by-wallet", s.LoginByWallet)
+		g.PUT("/login-by-dot", s.LoginByDotWallet)
+		g.PUT("/login-by-eth", s.LoginByEthWallet)
 		g.PUT("/sign-tx", s.SignTx)
 	}
 }

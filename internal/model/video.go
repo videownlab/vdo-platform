@@ -47,6 +47,7 @@ type VideoMetadata struct {
 	NftStatus    string `json:"nftStatus"`
 	Chain        string `json:"chain"`
 	ContractAddr string `gorm:"default:NULL" json:"contractAddr"`
+	NftType      string `gorm:"size:16" json:"nftType"`
 }
 
 func (t FileStatus) String() string {

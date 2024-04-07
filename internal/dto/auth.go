@@ -10,10 +10,17 @@ type (
 		AuthCode string `json:"authCode" form:"authCode" binding:"required,min=1,max=6"`
 	}
 
-	WalletLoginReq struct {
+	DotWalletLoginReq struct {
 		Address   string `binding:"required,min=40,max=60" json:"address" form:"address"`
 		Timestamp int64  `binding:"required" json:"timestamp" form:"timestamp"`
 		Sign      string `form:"sign" binding:"required" json:"sign"`
+	}
+
+	EthWalletLoginReq struct {
+		EthAddress string `binding:"required,min=40,max=60" json:"ethAddress" form:"ethAddress"`
+		DotAddress string `binding:"required,min=40,max=60" json:"dotAddress" form:"dotAddress"`
+		Timestamp  int64  `binding:"required" json:"timestamp" form:"timestamp"`
+		Sign       string `form:"sign" binding:"required" json:"sign"`
 	}
 
 	SignTxReq struct {

@@ -53,7 +53,7 @@ func ParseJwtToken(tokenString string) (*CustomClaims, error) {
 }
 
 func ApplyAuthCode(req dto.EmailAuthCodeReq) error {
-	authCode := utils.RandAlphanumeric(6)
+	authCode := utils.RandNumeric(6)
 	authCodeMap[req.Email] = AuthCode{Code: authCode, Timestamp: time.Now()}
 	if outputAuthCode {
 		logger.Info("apply auth-code", "authCode", authCode)
@@ -96,20 +96,11 @@ func LoginByEmail(req dto.EmailLoginReq) (*LoginResult, error) {
 			ctx.ChainClient.TransferBySs58Address(account.WalletAddress, amount)
 		}()
 	}
-	token, expiredTime, err := jwtHelper.GenerateToken(*account)
-	if err != nil {
-		return nil, err
-	}
-	return &LoginResult{
-		WalletAddress: account.WalletAddress,
-		AccountKind:   account.Kind,
-		Token:         token,
-		ExpiresAt:     expiredTime.Unix(),
-	}, nil
+	return generateLoginResult(account)
 }
 
-func LoginByWallet(req dto.WalletLoginReq) (*LoginResult, error) {
-	if err := account.VerifyWalletSign(req.Address, req.Timestamp, req.Sign); err != nil {
+func LoginByDotWallet(req dto.DotWalletLoginReq) (*LoginResult, error) {
+	if err := account.VerifyDotWalletSign(req.Address, req.Timestamp, req.Sign); err != nil {
 		return nil, err
 	}
 	account, err := accountService.FetchByWalletAddress(req.Address)
@@ -118,11 +109,39 @@ func LoginByWallet(req dto.WalletLoginReq) (*LoginResult, error) {
 	}
 	if account == nil {
 		logger.Info("create account for wallet", "walletAddress", req.Address)
-		account, err = accountService.CreateByPrivateWallet(req.Address)
+		account, err = accountService.CreateByPrivateDotWallet(req.Address)
 		if err != nil {
 			return nil, err
 		}
 	}
+	return generateLoginResult(account)
+}
+
+func LoginByEthWallet(req dto.EthWalletLoginReq) (*LoginResult, error) {
+	_, err := account.VerifyEthWalletSign(req.EthAddress, req.DotAddress, req.Timestamp, req.Sign)
+	if err != nil {
+		return nil, err
+	}
+	account, err := accountService.FetchByWalletAddress(req.DotAddress)
+	if err != nil {
+		return nil, err
+	}
+	if account == nil {
+		logger.Info("create account for eth wallet", "dotWalletAddress", req.DotAddress, "ethWalletAddress", req.EthAddress)
+		account, err = accountService.CreateByPrivateEthWallet(req.DotAddress, req.EthAddress)
+		if err != nil {
+			return nil, err
+		}
+		go func() {
+			amount := big.NewInt(10000)
+			logger.Info("give money to wallet", "dotWalletAddress", account.WalletAddress, "ethWalletAddress", req.EthAddress, "amount", amount)
+			ctx.ChainClient.TransferBySs58Address(account.WalletAddress, amount)
+		}()
+	}
+	return generateLoginResult(account)
+}
+
+func generateLoginResult(account *ae.Account) (*LoginResult, error) {
 	token, expiredTime, err := jwtHelper.GenerateToken(*account)
 	if err != nil {
 		return nil, err

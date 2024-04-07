@@ -9,6 +9,7 @@ type CreateReq struct {
 	CoverImage  string `json:"image"`
 	Length      string `json:"length"`
 	Label       string `json:"label"`
+	NftType     string `json:"nftType"`
 }
 
 type NftReq struct {

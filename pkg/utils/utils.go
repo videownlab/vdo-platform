@@ -2,6 +2,8 @@ package utils
 
 import (
 	"bytes"
+	"fmt"
+	"math"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -90,4 +92,13 @@ func RandAlphanumeric(n int) string {
 		remain--
 	}
 	return *(*string)(unsafe.Pointer(&b))
+}
+
+func RandNumeric(n int) string {
+	if n <= 0 {
+		return ""
+	}
+	upper := int64(math.Pow10(n)) - 1
+	r := rand.Int63n(upper)
+	return fmt.Sprintf("%0d", r)
 }
